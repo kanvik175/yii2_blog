@@ -3,6 +3,7 @@
 namespace app\modules\admin\controllers;
 
 use app\models\ImageUpload;
+use app\models\Tag;
 use Yii;
 use app\models\Article;
 use app\models\Category;
@@ -164,6 +165,25 @@ class ArticleController extends Controller
             'article' => $article,
             'selectedCategory' => $selectedCategory,
             'categories' => $categories
+        ]);
+    }
+
+    public function actionSetTags($id)
+    {
+        $article = $this->findModel($id);
+        $selectedTags = $article->getSelectedTags();
+        $tags = ArrayHelper::map(Tag::find()->all(), 'id', 'title');
+
+        if (Yii::$app->request->isPost) {
+            $tags = Yii::$app->request->post('tags');
+            if ($article->saveTags($tags)) {
+                return $this->redirect(['view', 'id' => $id]);
+            }
+        }
+
+        return $this->render('tags', [
+            'selectedTags' => $selectedTags,
+            'tags' => $tags
         ]);
     }
 
